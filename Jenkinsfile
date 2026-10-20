@@ -1,48 +1,58 @@
+
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag')
-        booleanParam(name: 'PUSH_IMAGE', defaultValue: true, description: 'Push image to Docker Hub?')
-    }
-
-    environment {
-        IMAGE_NAME = "devopssteps/my-app-15"
-    }
-
     stages {
-        stage('clone') {
+        stage('Build') {
             steps {
-                echo 'clone code............'
-                checkout scm
+                echo 'Building application...'
             }
         }
 
-        stage('build image') {
+        stage('Test') {
             steps {
-                echo "Building Docker image with tag: ${params.IMAGE_TAG}"
-                echo "Pretend command: docker build -t ${IMAGE_NAME}:${params.IMAGE_TAG} ."
+                echo 'Running tests...'
             }
         }
 
-        stage('push image') {
-            when {
-                expression { return params.PUSH_IMAGE }
-            }
+        stage('Deploy') {
             steps {
-                echo "Pretend command: docker push ${IMAGE_NAME}:${params.IMAGE_TAG}"
+                echo 'Deploying application...'
             }
         }
     }
+
     post {
         success {
-            echo 'Pipeline succeeded!'
+            echo 'SUCCESS: Pipeline completed successfully!'
         }
+
         failure {
-            echo 'Pipeline failed!'
+            echo 'FAILURE: Pipeline failed!'
         }
+
         always {
-            echo 'Pipeline finished.'
+            echo 'ALWAYS: Pipeline execution has finished.'
+        }
+
+        unstable {
+            echo 'UNSTABLE: Pipeline completed with warnings or unstable tests.'
+        }
+
+        changed {
+            echo 'CHANGED: Pipeline status differs from the previous run.'
+        }
+
+        fixed {
+            echo 'FIXED: Pipeline is successful after a previous failure or unstable run.'
+        }
+
+        aborted {
+            echo 'ABORTED: Pipeline was manually or externally aborted.'
+        }
+
+        cleanup {
+            echo 'CLEANUP: Performing final cleanup tasks.'
         }
     }
 }
