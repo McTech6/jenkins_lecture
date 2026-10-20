@@ -2,64 +2,57 @@
 pipeline {
     agent any
 
-    environment {
-        RECIPIENT_EMAIL = 'tiddingramsey@gmail.com'
-    }
-
     stages {
         stage('Build') {
             steps {
                 echo 'Building application...'
-                sh 'exit 0'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
             }
         }
     }
 
     post {
         success {
-            emailext(
-                to: "${RECIPIENT_EMAIL}",
-                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-Hello,
-
-Your Jenkins pipeline completed successfully.
-
-Job: ${env.JOB_NAME}
-Build Number: ${env.BUILD_NUMBER}
-Status: ${currentBuild.currentResult}
-Build URL: ${env.BUILD_URL}
-
-Regards,
-Jenkins
-"""
-            )
+            echo 'SUCCESS: Pipeline completed successfully!'
         }
 
         failure {
-            emailext(
-                to: "${RECIPIENT_EMAIL}",
-                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-Hello,
-
-Your Jenkins pipeline has failed.
-
-Job: ${env.JOB_NAME}
-Build Number: ${env.BUILD_NUMBER}
-Status: ${currentBuild.currentResult}
-Build URL: ${env.BUILD_URL}
-
-Please check the Jenkins console output to investigate the failure.
-
-Regards,
-Jenkins
-"""
-            )
+            echo 'FAILURE: Pipeline failed!'
         }
 
         always {
-            echo "Pipeline execution finished with status: ${currentBuild.currentResult}"
+            echo 'ALWAYS: Pipeline execution has finished.'
+        }
+
+        unstable {
+            echo 'UNSTABLE: Pipeline completed with warnings or unstable tests.'
+        }
+
+        changed {
+            echo 'CHANGED: Pipeline status differs from the previous run.'
+        }
+
+        fixed {
+            echo 'FIXED: Pipeline is successful after a previous failure or unstable run.'
+        }
+
+        aborted {
+            echo 'ABORTED: Pipeline was manually or externally aborted.'
+        }
+
+        cleanup {
+            echo 'CLEANUP: Performing final cleanup tasks.'
         }
     }
 }
