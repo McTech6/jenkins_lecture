@@ -6,53 +6,30 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building application...'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application...'
+                sh 'exit 0'
             }
         }
     }
 
     post {
         success {
-            echo 'SUCCESS: Pipeline completed successfully!'
+            emailext(
+                subject: "Build SUCCESS: ${env.JOB_NAME}",
+                body: "Job ${env.JOB_NAME} build #${env.BUILD_NUMBER} was successful.",
+                to: 'recipient@example.com'
+            )
         }
 
         failure {
-            echo 'FAILURE: Pipeline failed!'
+            emailext(
+                subject: "Build FAILURE: ${env.JOB_NAME}",
+                body: "Job ${env.JOB_NAME} build #${env.BUILD_NUMBER} failed.",
+                to: 'recipient@example.com'
+            )
         }
 
         always {
-            echo 'ALWAYS: Pipeline execution has finished.'
-        }
-
-        unstable {
-            echo 'UNSTABLE: Pipeline completed with warnings or unstable tests.'
-        }
-
-        changed {
-            echo 'CHANGED: Pipeline status differs from the previous run.'
-        }
-
-        fixed {
-            echo 'FIXED: Pipeline is successful after a previous failure or unstable run.'
-        }
-
-        aborted {
-            echo 'ABORTED: Pipeline was manually or externally aborted.'
-        }
-
-        cleanup {
-            echo 'CLEANUP: Performing final cleanup tasks.'
+            echo 'Pipeline execution finished.'
         }
     }
 }
